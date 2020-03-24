@@ -16,7 +16,7 @@ GLM.func <- function(geno = NULL, pheno = NULL, covariates = NULL, PCs = 1, thre
 
 	PCA <- prcomp(working.geno) #perform PCA on the genotypes
 	filtered.PCs <- filter.pca(PCA = PCA, covs = working.cov, threshold = working.thresh) #filter PCs by covariates according to correlation threshold supplied by user
-	used.PCs <- filtered.PCs$x[,1:working.PCs]
+	used.PCs <- filtered.PCs$x[,1:working.PCs] #creates matrix of PCs to be used in the GLM
 
 	sample.n <- nrow(working.geno) #number of samples in data
 	marker.n <- ncol(working.geno) #number of markers in data

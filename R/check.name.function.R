@@ -5,7 +5,7 @@
 #' @return A data frame with row names from the first column if the first column was not numeric or integer
 
 check.name <- function(df){
-	if(!is.data.frame(df)){
+	if(is.na(df)){
 		return(df)
 	}else{
 		library(tidyverse)

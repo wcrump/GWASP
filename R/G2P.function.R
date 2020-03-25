@@ -3,9 +3,9 @@
 #' @param X A genotype matrix (rows = taxa, columns = markers).
 #' @param h2 The heritability of the simulated trait.
 #' @param alpha The p parameter in an approximated geometric distribution
-#' @NQTN The number markers contributing to the phenotype
-#' @a2 The proportion of non-additive interactive variance (FIXED at 0 for our current uses)
-#' @seed A seed number to fix the randomization (if desired)
+#' @param NQTN The number markers contributing to the phenotype
+#' @param a2 The proportion of non-additive interactive variance (FIXED at 0 for our current uses)
+#' @param seed A seed number to fix the randomization (if desired)
 #' @return A list of the marker effects (1*NQTN), the phenotype (n*1), the combined additive effects (n*1), the residual effects (n*1), the additive marker indices (1*m), and the interaction marker positions (1*nint)
 
 G2P <- function(X = NULL,h2 = 0.5,alpha = 1,NQTN = 10,distribution = "normal",a2=0){

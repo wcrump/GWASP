@@ -12,6 +12,12 @@ G2P(X = NULL, h2 = 0.5, alpha = 1, NQTN = 10, distribution = "normal", a2 = 0)
 \item{h2}{The heritability of the simulated trait.}
 
 \item{alpha}{The p parameter in an approximated geometric distribution}
+
+\item{NQTN}{The number markers contributing to the phenotype}
+
+\item{a2}{The proportion of non-additive interactive variance (FIXED at 0 for our current uses)}
+
+\item{seed}{A seed number to fix the randomization (if desired)}
 }
 \value{
 A list of the marker effects (1*NQTN), the phenotype (n*1), the combined additive effects (n*1), the residual effects (n*1), the additive marker indices (1*m), and the interaction marker positions (1*nint)

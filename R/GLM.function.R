@@ -7,7 +7,7 @@
 #' @param thresh A numeric (0-1) indicating the correlation value of any PC-covariate pair at which the PC will be exluded from model
 #' @return A matrix of p values with dimensions 1 x m
 
-GLM.func <- function(geno = NULL, pheno = NULL, covariates = NULL, PCs = 1, thresh = 0.2){
+GLM.func <- function(geno = NULL, pheno = NULL, covariates = NA, PCs = 1, thresh = 0.2){
 	working.geno <- check.name(geno) #pull user input into genotype matrix, possible data transformation?
 	working.pheno <- check.name(pheno) #pull user input into phenotype matrix
 	working.cov <- check.name(covariates) #pull user input into covariate matrix

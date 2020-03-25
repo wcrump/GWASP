@@ -8,9 +8,9 @@
 #' @return A matrix of p values with dimensions 1 x m
 
 GLM.func <- function(geno = NULL, pheno = NULL, covariates = NULL, PCs = 1, thresh = 0.2){
-	working.geno <- geno[,-1] #pull user input into genotype matrix, possible data transformation?
-	working.pheno <- pheno[,-1] #pull user input into phenotype matrix
-	working.cov <- covariates[,-1] #pull user input into covariate matrix
+	working.geno <- check.name(geno) #pull user input into genotype matrix, possible data transformation?
+	working.pheno <- check.name(pheno) #pull user input into phenotype matrix
+	working.cov <- check.name(covariates) #pull user input into covariate matrix
 	working.PCs <- PCs #pull in user-defined number of PCs into PC matrix
 	working.thresh <- thresh #pull in user-defined correlation threshold between any given PC-covariate pair
 

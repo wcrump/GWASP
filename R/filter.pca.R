@@ -16,6 +16,7 @@ filter.pca <- function(PCA, covs=NA, threshold=0.2){
 
 		PCA$x <- PCA$x[,-index.vect]
 
-	}return(PCA)
+	}
+	return(PCA)
 
 }

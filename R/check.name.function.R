@@ -8,9 +8,8 @@ check.name <- function(df){
 	if(is.na(df)){
 		return(df)
 	}else{
-		library(tidyverse)
 		if (class(df[,1]) != "integer" & class(df[,1]) != "numeric"){
-			df <- column_to_rownames(df, var = colnames(df[1]))
+			df <- df[,-1]
 		}
 	}
 	return(df)

@@ -7,7 +7,7 @@ Maintainer: The package maintainer <william.crump@wsu.edu>
 Description: Perform GWAS using GLM incorporating PCs and additional covariates.
     User-supplied covariate data and a user-specified number of non-linear dependent PCs
     are incorporated into a general linear model to better account of population structure.
-URL: Tutorials: https://github.com/wcrump/GWASP/tree/master/Tutorials FAQ: https://github.com/wcrump/GWASP/tree/master/FAQ
+URL: Tutorials: https://github.com/wcrump/GWASP/tree/master/Tutorials FAQ: https://wcrump.github.io/GWASP/FAQ/FAQ.html
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true

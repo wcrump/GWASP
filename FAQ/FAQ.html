@@ -186,6 +186,21 @@ summary {
 <h3>What is the purpose of this package?</h3>
 <p>The purpose of this package is to perform genome-wide associations. It implements covariates supplied by the user, as well as other covariates in the form of principle components generated from the genotype data as fixed effects in a general linear model.</p>
 </div>
+<div id="what-format-should-my-genotype-data-be-in-for-use-in-this-package" class="section level3">
+<h3>What format should my genotype data be in for use in this package?</h3>
+<p>Genotypic data should be in numeric format with taxa as rows and markers as columns. The first column need not contain the taxa ID, as long as the order is known to the user (i.e. they are non-essential for the function to run).</p>
+<p>An example:</p>
+<pre><code>##    taxa PZB00859.1 PZA01271.1 PZA03613.2 PZA03613.1
+## 1 33-16          2          0          0          2
+## 2 38-11          2          2          0          2
+## 3  4226          2          0          0          2
+## 4  4722          2          2          0          2
+## 5  A188          0          0          0          2</code></pre>
+<p>Source: <a href="http://zzlab.net/GAPIT/data/mdp_numeric.txt">link</a></p>
+</div>
+<div id="what-format-should-my-phenotype-data-be-in-for-use-in-this-package" class="section level3">
+<h3>What format should my phenotype data be in for use in this package?</h3>
+</div>
 </div>
 
 

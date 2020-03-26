@@ -2,7 +2,7 @@
 % Please edit documentation in R/check.name.function.R
 \name{check.name}
 \alias{check.name}
-\title{Check first column of matrix for names}
+\title{Check first column of data frame for names}
 \usage{
 check.name(df)
 }
@@ -10,8 +10,8 @@ check.name(df)
 \item{df}{A data frame}
 }
 \value{
-A data frame with row names from the first column if the first column was not numeric or integer
+A data frame (with first column removed if values were not integers or numerics)
 }
 \description{
-If values in first column are not integers or numerics, the first column will be changed to a row name.
+If values in first column of data frame are not integers or numerics, the first column will be erased.
 }

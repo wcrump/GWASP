@@ -12,7 +12,7 @@ GWASbyCor(X, y)
 \item{y}{A phenotype vector of length n}
 }
 \value{
-A vector of p values of length m
+A vector of p-values of length m
 }
 \description{
 Perform GWAS by Correlation

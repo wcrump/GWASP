@@ -1,4 +1,6 @@
-#' GLM Function
+#' GWAS by GLM
+#'
+#' Perform GWAS using a general linear model method incorporating principle components and additional covariates if present.
 #'
 #' @param geno A matrix of genotype data with dimensions n x m
 #' @param pheno A matrix of phenotype data with dimensions n x 1

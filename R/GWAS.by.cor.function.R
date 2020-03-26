@@ -2,7 +2,7 @@
 #'
 #' @param X A genotype matrix with dimensions n x m (rows = taxa, columns = markers).
 #' @param y A phenotype vector of length n
-#' @return A vector of p values of length m
+#' @return A vector of p-values of length m
 
 
 #GWAS by correlation

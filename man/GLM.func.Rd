@@ -2,7 +2,7 @@
 % Please edit documentation in R/GLM.function.R
 \name{GLM.func}
 \alias{GLM.func}
-\title{GLM Function}
+\title{GWAS by GLM}
 \usage{
 GLM.func(geno = NULL, pheno = NULL, covariates = NULL, PCs = 1, thresh = 0.2)
 }
@@ -21,5 +21,5 @@ GLM.func(geno = NULL, pheno = NULL, covariates = NULL, PCs = 1, thresh = 0.2)
 A matrix of p values with dimensions 1 x m
 }
 \description{
-GLM Function
+Perform GWAS using a general linear model method incorporating principle components and additional covariates if present.
 }

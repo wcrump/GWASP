@@ -2,19 +2,19 @@
 % Please edit documentation in R/filter.pca.R
 \name{filter.pca}
 \alias{filter.pca}
-\title{Filter out PCs colinear with other covariates.}
+\title{Filter PCs}
 \usage{
-filter.pca(PCA, covs, threshold = 0.2)
+filter.pca(PCA, covs = NULL, threshold = 0.2)
 }
 \arguments{
 \item{PCA}{The output list from the prcomp() function.}
 
-\item{covs}{A matrix/data.frame of covariates (rows = individuals, columns = covariates)}
+\item{covs}{A matrix/data frame of covariates (rows = individuals, columns = covariates)}
 
 \item{threshold}{A numerical value (0-1) indicating the maximum allowed correlation between any one covariate and any one PC}
 }
 \value{
-A matrix of filtered PCs (not correlated with any covariates supplied by user)
+A prcomp() list output with PCs filtered
 }
 \description{
 Filter out PCs colinear with other covariates.

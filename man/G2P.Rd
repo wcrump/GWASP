@@ -13,15 +13,13 @@ G2P(X = NULL, h2 = 0.5, alpha = 1, NQTN = 10, distribution = "normal", a2 = 0)
 
 \item{alpha}{The p parameter in an approximated geometric distribution}
 
-\item{NQTN}{The number markers contributing to the phenotype}
+\item{NQTN}{The number markers contributing to the phenotype (if known)}
 
-\item{a2}{The proportion of non-additive interactive variance (FIXED at 0 for our current uses)}
-
-\item{seed}{A seed number to fix the randomization (if desired)}
+\item{a2}{The proportion of non-additive interactive variance}
 }
 \value{
 A list of the marker effects (1*NQTN), the phenotype (n*1), the combined additive effects (n*1), the residual effects (n*1), the additive marker indices (1*m), and the interaction marker positions (1*nint)
 }
 \description{
-Simulate a phenotype
+Simulate a phenotypic data from genotypic data.
 }

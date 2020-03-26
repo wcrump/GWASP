@@ -181,14 +181,14 @@ summary {
 
 
 <div id="frequently-asked-questions" class="section level1">
-<h1>Frequently Asked Questions</h1>
+<h1>Frequently Asked Questions:</h1>
 <div id="what-is-the-purpose-of-this-package" class="section level3">
 <h3>What is the purpose of this package?</h3>
 <p>The purpose of this package is to perform genome-wide associations. It implements covariates supplied by the user, as well as other covariates in the form of principle components generated from the genotype data as fixed effects in a general linear model.</p>
 </div>
 <div id="what-format-should-my-genotype-data-be-in-for-use-in-this-package" class="section level3">
 <h3>What format should my genotype data be in for use in this package?</h3>
-<p>Genotypic data should be in numeric format with taxa as rows and markers as columns. The first column need not contain the taxa ID, as long as the order is known to the user (i.e. they are non-essential for the function to run).</p>
+<p>Genotypic data should be in numeric matrix/dataframe format with taxa as rows and markers as columns. The first column need not contain the taxa ID, as long as the order is known to the user (i.e. they are non-essential for the function to run).</p>
 <p>An example:</p>
 <pre><code>##    taxa PZB00859.1 PZA01271.1 PZA03613.2 PZA03613.1
 ## 1 33-16          2          0          0          2
@@ -196,10 +196,43 @@ summary {
 ## 3  4226          2          0          0          2
 ## 4  4722          2          2          0          2
 ## 5  A188          0          0          0          2</code></pre>
-<p>Source: <a href="http://zzlab.net/GAPIT/data/mdp_numeric.txt">link</a></p>
+<p>Source: <a href="http://zzlab.net/GAPIT/data/mdp_numeric.txt" class="uri">http://zzlab.net/GAPIT/data/mdp_numeric.txt</a></p>
 </div>
 <div id="what-format-should-my-phenotype-data-be-in-for-use-in-this-package" class="section level3">
 <h3>What format should my phenotype data be in for use in this package?</h3>
+<p>Phenotypic data should be in a numeric matrix/dataframe formate with taxa as rows and a phenotype measure column. Only one phenotype should be present. Again, the first column does not need to contain the taxa ID (i.e. it can be a one column matrix)</p>
+<p>An example:</p>
+<pre><code>##    Taxa        Obs
+## 1 33-16 -1.2731037
+## 2 38-11  0.5515271
+## 3  4226 -0.2549273
+## 4  4722 -6.1229643
+## 5  A188 -2.5939825</code></pre>
+<p>Source: <a href="http://zzlab.net/GAPIT/data/CROP545_Phenotype.txt" class="uri">http://zzlab.net/GAPIT/data/CROP545_Phenotype.txt</a></p>
+</div>
+<div id="what-format-should-my-covariate-data-be-in-for-use-in-this-package" class="section level3">
+<h3>What format should my covariate data be in for use in this package?</h3>
+<p>Covariate data should be formatted in the same way as phenotypic data–taxa as rows and covariates in subsequent columns.</p>
+<p>An example:</p>
+<pre><code>##    Taxa  FactorA  FactorB
+## 1 33-16 2.531331 5.501464
+## 2 38-11 2.633860 4.655691
+## 3  4226 1.890695 6.136883
+## 4  4722 1.856035 7.841858
+## 5  A188 2.552629 5.409450</code></pre>
+<p>Source: <a href="http://zzlab.net/GAPIT/data/CROP545_Covariates.txt" class="uri">http://zzlab.net/GAPIT/data/CROP545_Covariates.txt</a></p>
+</div>
+<div id="how-are-principle-components-generated" class="section level3">
+<h3>How are Principle Components generated?</h3>
+<p>Principle components are generated through use of the ‘stats’ package’s function prcomp()</p>
+</div>
+<div id="is-there-any-risk-of-redundancy-between-my-covariates-and-the-principle-components-calculated" class="section level3">
+<h3>Is there any risk of redundancy between my covariates and the principle components calculated?</h3>
+<p>No, the filter.pca() function in this package takes care of that. This function is called inside of the GLM.func() function, which acts as the major workhorse function of the package.</p>
+</div>
+<div id="wow-you-guys-seem-very-smart-did-you-come-up-with-all-these-functions-independently" class="section level3">
+<h3>Wow, you guys seem very smart, did you come up with all these functions independently?</h3>
+<p>NO! These functions borrow heavily, or are identical to scripts from our CROPS_545 course at WSU taught by the fabled Dr. Zhiwu Zheng and TA’d by the more-than-capable Matthew McGowan. But we’re flattered you thought that.</p>
 </div>
 </div>
 

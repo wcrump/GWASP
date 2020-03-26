@@ -8,7 +8,7 @@
 
 manhattan_plot <- function(marker_map, pvals, QTN_index = c(), trait = "unknown")
 {
-	marker_map$pvals <- -log10(pvals) # Add pvalues to the data.frame and log10 transform
+	marker_map$pvals <- -log10(t(pvals)) # Add pvalues to the data.frame and log10 transform
 
 	marker_map$comb_pos <- marker_map$chr * 1e9 + marker_map$pos
 	manhattan_plot <- ggplot(marker_map, aes(x = 1:nrow(marker_map), y = pvals, color = factor(chr))) +

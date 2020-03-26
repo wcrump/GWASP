@@ -1,0 +1,5 @@
+# Frequently Asked Questions
+
+### What is the purpose of this package?
+The purpose of this package is to perform genome-wide associations. It implements covariates supplied by the user, as well as other covariates in the form of principle components generated from the genotype data as fixed effects in a general linear model.  
+

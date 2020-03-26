@@ -5,9 +5,9 @@
 #' @param threshold A numerical value (0-1) indicating the maximum allowed correlation between any one covariate and any one PC
 #' @return A matrix of filtered PCs (not correlated with any covariates supplied by user)
 
-filter.pca <- function(PCA, covs=NA, threshold=0.2){
+filter.pca <- function(PCA, covs=NULL, threshold=0.2){
 
-	if(is.na(covs)){
+	if(is.null(covs)){
 		return(PCA)
 	}else{
 		correlation.matrix <- cor(PCA$x, covs)

@@ -1,4 +1,6 @@
 ## Dependencies ----
+install.packages("ggplot2")
+library(ggplot2)
 # Download the GWASP package from Github: https://github.com/wcrump/GWASP
 # Once you have made a copy of the repository your working directory, file paths should work as written
 source("R/GLM.function.R") #This is our main function, GWASP
@@ -48,10 +50,9 @@ covariate.data <- read.table("Data/CROP545_Covariates.txt", header = T)
 phenotype.data <- read.table("Data/CROP545_Phenotype.txt", header = T)
 genotype.data <- read.table("Data/mdp_numeric.txt", header = T)
 marker.map <- read.table("Data/mdp_SNP_information.txt", header = T)
-colnames(marker.map) <- c("rs", "chr", "pos")
 
 ## Perform GWAS using GWASP function ----
-p.values <- GWASP(X = genotype.data, y = phenotype.data, C = covariate.data, PCs = 3, r = 0.3)
+p.values <- GLM.func(geno = genotype.data, pheno = phenotype.data, covariates = covariate.data, PCs = 3, thresh = 0.3)
 
 ## Create Manhattan and QQ Plots ----
 p.vec <- as.vector(p.values) #transforms data type of p-values to run in manhattan plot function
@@ -66,9 +67,22 @@ cutoff=quantile(p.vec,type1,na.rm=T) #calculation of quantiles
 genome.thresh <- cutoff[1] #with a type 1 error rate of 1%, we can excpect SNPs with p-values higher than this to be associated SNPs
 
 associated.SNP.index <- p.values <= genome.thresh #creates index of associated SNPs
-associated.SNPs <- marker.map$pos[associated.SNP.index]
+associated.SNPs <- which(associated.SNP.index) #let's us know which of our 3000 markers are our significant ones
 
-GWASP_manhattan <- manhattan_plot(marker_map = marker.map, pvals = p.vec, QTN_index = associated.SNPs)
+GWASP_manhattan <- manhattan_plot(marker_map = marker.map, pvals = p.vec, QTN_index = associated.SNPs) #create manhattan plot
+GWASP_manhattan <- GWASP_manhattan + geom_hline(yintercept = -log10(genome.thresh), linetype = "dashed", color = "black") #add significance threshold
+GWASP_manhattan #view manhattan plot
+
 #Comments on MAF of associated SNPs
+sig.snps.geno <- genotype.data[,associated.SNPs]
 
+minor_allele_freq <- apply(sig.snps.geno, 2, function(x) #we're applying the function(x) across all columns, designated by the 2, in working_geno_40scaffolds
+{
+	allele_freq0 <- (sum(x == 0)*2 + sum(x == 1)) / (sum(!is.na(x)) * 2) #frequency of allele 0 is calculated, includes half of heterozygote frequency
+	allele_freq2 <- (sum(x == 2)*2 + sum(x == 1)) / (sum(!is.na(x)) * 2) #frequency of allele 2 is calculated, includes half of heterozygote frequency
+	return(min(allele_freq0, allele_freq2)) #now we compare allele freq 0 to allele freq 2 and return the lesser of the two
+})
+
+ggplot(data = as.data.frame(minor_allele_freq), aes(x= seq_along(minor_allele_freq), y = minor_allele_freq)) + geom_point() +
+	labs(title = "Distribution of Minor Allele Frequency of Significant SNPs", x = "SNP Index", y = "Minor Allele Frequency")
 ## GWASP is Superior to GWASbyCor ----

@@ -85,4 +85,97 @@ minor_allele_freq <- apply(sig.snps.geno, 2, function(x) #we're applying the fun
 
 ggplot(data = as.data.frame(minor_allele_freq), aes(x= seq_along(minor_allele_freq), y = minor_allele_freq)) + geom_point() +
 	labs(title = "Distribution of Minor Allele Frequency of Significant SNPs", x = "SNP Index", y = "Minor Allele Frequency")
-## GWASP is Superior to GWASbyCor ----
+## GWASP is Superior to GWASbyCor, not by speed but by statistical power ----
+#time an empty for loop to compare our two function times to, repeat 30 times
+empty_counter <- 0 #create counter
+empty_times <- vector('numeric') #create empty vector to store our loop times in
+repeat{
+	empty_start <- proc.time() #start timer
+	for (i in 1:100){ #empty loop
+
+	}
+	empty_end <- proc.time() #end timer
+	empty_elapsed <- empty_end[3] - empty_start[3] #calculate elapsed time passed
+	empty_times <- append(empty_times, values = empty_elapsed) #append new time to time vector
+	empty_counter <- empty_counter +1 #add one to our counter
+	if (empty_counter == 30){ #break the loop once our counter reaches 30
+		break
+	}
+}
+mean(empty_times) #calculate mean of empty loop
+sd(empty_times) #calculate sd of empty loop
+
+#we can use the same code structure to time our function
+GWASP_counter <- 0
+GWASP_times <- vector('numeric')
+repeat{
+	GWASP_start <- proc.time()
+	p.GWASP <- GLM.func(geno = genotype.data, pheno = phenotype.data, covariates = covariate.data, PCs = 1, thresh = 0.2)
+	GWASP_end <- proc.time()
+	GWASP_elapsed <- GWASP_end[3] - GWASP_start[3]
+	GWASP_times <- append(GWASP_times, values = GWASP_elapsed)
+	GWASP_counter <- GWASP_counter +1
+	if (GWASP_counter == 30) {
+		break
+	}
+}
+mean(GWASP_times)
+sd(GWASP_times)
+
+#we want to perform GWASbyCor and see if our GWAS function is faster or slower
+GWASbyCor_counter <- 0
+GbyCor_times <- vector('numeric')
+repeat{
+	GbyCor_start <- proc.time()
+	p.GbyCor <- GWASbyCor(X = genotype.data[,-1], y = phenotype.data[,-1])
+	GbyCor_end <- proc.time()
+	GbyCor_elapsed <- GbyCor_end[3] - GbyCor_start[3]
+	GbyCor_times <- append(GbyCor_times, values = GbyCor_elapsed)
+	GWASbyCor_counter <- GWASbyCor_counter +1
+	if (GWASbyCor_counter == 30) {
+		break
+	}
+}
+mean(GbyCor_times)
+sd(GbyCor_times)
+#we can see that our GWAS function is slower than GWASbyCor, so we'll have to beat it on statistical power
+#we're going to use the GAPIT function GAPIT.FDR.Type1 to compare power and FDR between the two methods
+nrep=30 #number of replicates
+set.seed(89760)
+GWASP.Rep=replicate(nrep, { #we're using the replicate function to perform GWAS and then calculate power and FDR multiple times
+	GWASP.sim <- GLM.func(geno = genotype.data, pheno = phenotype.data, covariates = covariate.data) #perform GWAS
+	seqQTN <- associated.SNPs # reminder that we're using our 31 SNPs
+	myGWAS <- cbind(marker.map,t(GWASP.sim),NA) #appends our GWAS results to our marker map into a single data frame
+	#calculates power and FDR using the GAPIT.FDR.TypeI function, most parameters kept to default
+	myStat <- GAPIT.FDR.TypeI(WS=c(1e0,1e3,1e4,1e5), GM = marker.map, seqQTN = associated.SNPs, GWAS = myGWAS, maxOut = 100,MaxBP=1e10)
+})
+
+set.seed(89761)
+GbyCor.Rep <- replicate(nrep, { #we can use the same replicate function structure to calculate FDR and power for GWASbyCor
+	GbyCor.sim <- GWASbyCor(X = genotype.data[,-1], y = phenotype.data[,-1])
+	seqQTN <- associated.SNPs
+	myGWAS <- cbind(marker.map, t(GbyCor.sim), NA)
+	mySTAT <- GAPIT.FDR.TypeI(WS = c(1e0, 1e3, 1e4, 1e5), GM = marker.map, seqQTN = associated.SNPs, GWAS = myGWAS, maxOut = 100, MaxBP = 1e10)
+})
+
+power.GWASP <- GWASP.Rep[[2]] #pulling out the power of the function for use in plotting
+power.GbyCor <- GbyCor.Rep[[2]] #pulling out the power of the function for use in plotting
+
+#FDR
+gwasp.fdr.seq <- seq(3,length(GWASP.Rep),7) #creates index of where FDR values are stored of every replicate
+gwasp.fdr <- GWASP.Rep[gwasp.fdr.seq] #pulls all FDR outputs into a new list of just FDR data
+gwasp.fdr.mean <- Reduce ("+", gwasp.fdr) / length(gwasp.fdr) #calculates the FDR mean for each individual replicate
+
+gbycor.fdr.seq <- seq(3, length(GbyCor.Rep), 7)
+gbycor.fdr <- GbyCor.Rep[gbycor.fdr.seq]
+gbycor.fdr.mean <- Reduce ("+", gbycor.fdr) / length(gbycor.fdr)
+
+theColor=rainbow(4) #creates color vector
+plot(gwasp.fdr.mean[,1],power.GWASP , type="b", col=theColor [1],xlim=c(0,1)) #plots GWASP FDR means against power
+for(i in 2:ncol(gwasp.fdr.mean)){ #shows different 'resolutions' as different colors
+	lines(gwasp.fdr.mean[,i], power.GWASP , type="b", col= theColor [i])
+}
+plot(gbycor.fdr.mean[,1],power.GbyCor , type="b", col=theColor [1],xlim=c(0,1)) #plots GbyCor FDR means against power
+for(i in 2:ncol(gbycor.fdr.mean)){ #shows different 'resolutions' as different colors
+	lines(gbycor.fdr.mean[,i], power.GbyCor , type="b", col= theColor [i])
+}

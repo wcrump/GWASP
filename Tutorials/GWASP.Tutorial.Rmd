@@ -1,0 +1,45 @@
+---
+title: "GWASP Tutorial: How to download and use GWASP"
+author: "William Crump and Elliott Marston"
+date: "3/27/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(devtools) #for importing GWASP package
+
+```
+
+## GWASP Tutorial
+
+The purpose of this tutorial is to familiarize you with how to install and use the GWASP package to perform Genome Wide Association Studies (GWAS) using a General Linear Model (GLM) that incorporates Principle Companent Analysis (PCA). 
+
+The GWASP package dependencies are BLANK, BLANK, and BLANK. Before downloading the GWASP package, make sure you have those packages installed and loaded into R. You can do that on your own, or by running the code you see below.
+
+Example:
+```{r GWASP dependencies}
+library(devtools)
+```
+
+## Downloading and Installing GWASP
+
+The easiest way to download the GWASP package is to use the install_github() command from the devtools package. 
+
+Example: 
+```{r install GWASP}
+devtools::install_github("wcrump/GWASP") #we use devtools here to pull our GWASP package from Github
+library(GWASP) #load the GWASP package into R
+```
+
+## Using the Functions of GWASP
+
+GWASP's GWAS function requires at least two inputs: a genotype matrix (rows = samples/individuals, columns = markers), and a vector of phenotype data. You can also include covariate data as a matrix of n by t dimensions if n is number of samples (individuals) and t is number of covariates. GWASP's GLM function automatically performs PCA on your data and you can choose how many principle components to include using the PCs input. If you choose to include covariates, the thresh input allows you to change what r threshold you want GLM.func to use to exclude principle components that are strongly co-linear with your covariates.
+
+```{r using GLM function}
+genotype.data <- read.table(file="http://zzlab.net/GAPIT/data/mdp_numeric.txt",head=T)
+phenotype.data <- read.table(file="http://zzlab.net/GAPIT/data/CROP545_Phenotype.txt",head=T)
+covariate.data <- read.table(file = "http://zzlab.net/GAPIT/data/CROP545_Covariates.txt", head = T)
+
+p.values <- GLM.func(geno = genotype.data, pheno = phenotype.data, covariates = covariate.data, PCs = 1, thresh = 0.2)
+```

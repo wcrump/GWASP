@@ -26,7 +26,7 @@ library(GWASP)
 
 ## GWASP Package
 
-The GWASP Package is available for download on Github at: https://github.com/wcrump/GWASP 
+The GWASP Package is available for download on Github at: [https://github.com/wcrump/GWASP](https://github.com/wcrump/GWASP) 
 
 The GWASP Manual is available at: LINK
 
@@ -140,7 +140,7 @@ When comparing the two plots, it's clear that the GWASP package has a lower fals
 
 ### Use Simulated Phenotype Data to compare GWASP with GWASbyCor
 ```{r problem5.2, warning=F}
-
+nrep=30
 set.seed(89763)
 GWASP.Rep=replicate(nrep, { #we're using the replicate function to perform GWAS and then calculate power and FDR multiple times
 	phenotype <- G2P(X=genotype.data[,-1], alpha=1, NQTN=10)

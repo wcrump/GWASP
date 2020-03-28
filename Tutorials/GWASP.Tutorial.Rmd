@@ -1,25 +1,22 @@
 ---
 title: "GWASP Tutorial: How to download and use GWASP"
-author: "William Crump and Elliott Marston"
-date: "3/27/2020"
 output: html_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(devtools) #for importing GWASP package
-
 ```
 
-## GWASP Tutorial
 
 The purpose of this tutorial is to familiarize you with how to install and use the GWASP package to perform Genome Wide Association Studies (GWAS) using a General Linear Model (GLM) that incorporates Principle Companent Analysis (PCA). 
 
-The GWASP package dependencies are BLANK, BLANK, and BLANK. Before downloading the GWASP package, make sure you have those packages installed and loaded into R. You can do that on your own, or by running the code you see below.
+The GWASP package dependencies are devtools and ggplot2. Before downloading the GWASP package, make sure you have those packages installed and loaded into R. You can do that on your own, or by running the code you see below.
 
 Example:
 ```{r GWASP dependencies}
 library(devtools)
+library(ggplot2)
 ```
 
 ## Downloading and Installing GWASP
@@ -27,19 +24,39 @@ library(devtools)
 The easiest way to download the GWASP package is to use the install_github() command from the devtools package. 
 
 Example: 
-```{r install GWASP}
+```{r install GWASP, message=F}
 devtools::install_github("wcrump/GWASP") #we use devtools here to pull our GWASP package from Github
 library(GWASP) #load the GWASP package into R
 ```
 
 ## Using the Functions of GWASP
 
-GWASP's GWAS function requires at least two inputs: a genotype matrix (rows = samples/individuals, columns = markers), and a vector of phenotype data. You can also include covariate data as a matrix of n by t dimensions if n is number of samples (individuals) and t is number of covariates. GWASP's GLM function automatically performs PCA on your data and you can choose how many principle components to include using the PCs input. If you choose to include covariates, the thresh input allows you to change what r threshold you want GLM.func to use to exclude principle components that are strongly co-linear with your covariates.
+GWASP's GWAS function requires at least two inputs: (X) a genotype matrix (rows = samples/individuals, columns = markers), and (y) a vector of phenotype data. You can also include covariate data as a matrix of n by t dimensions if n is number of samples (individuals) and t is number of covariates. GWASP's GLM function automatically performs PCA on your data and you can choose how many principle components to include using the PCs input. If you choose to include covariates, the r input allows you to change what r threshold you want GLM.func to use to exclude principle components that are strongly co-linear with your covariates.
 
 ```{r using GLM function}
-genotype.data <- read.table(file="http://zzlab.net/GAPIT/data/mdp_numeric.txt",head=T)
+genotype.data <- read.table(file="http://zzlab.net/GAPIT/data/mdp_numeric.txt",head=T) #bring in sample data
 phenotype.data <- read.table(file="http://zzlab.net/GAPIT/data/CROP545_Phenotype.txt",head=T)
 covariate.data <- read.table(file = "http://zzlab.net/GAPIT/data/CROP545_Covariates.txt", head = T)
 
-p.values <- GLM.func(geno = genotype.data, pheno = phenotype.data, covariates = covariate.data, PCs = 1, thresh = 0.2)
+p.values <- GLM.func(X = genotype.data, y = phenotype.data, C = covariate.data, PCs = 1, r = 0.2) #perform GWAS by GLM
+
+str(p.values) #show structure of output
+```
+
+## Create a Manhattan Plot
+
+An additional function housed in the GWASP package is the manhattan_plot() function. Inputs include: marker_map (a data frame with dimensions m x 3, with the columns being 'rs' (marker name), 'pos' (position of marker), and 'chr' (chromosome of marker)), pvals (p values from GWAS for each marker), QTN_index (marker position of any known QTNs), and trait (name of trait you are analyzing)
+
+```{r manhattan plot function}
+marker.map <- read.table(file="http://zzlab.net/GAPIT/data/mdp_SNP_information.txt",head=T) #bring in sample marker map
+p.values <- t(p.values) #transform the data so rows correspond with markers
+manhattan_plot(marker_map = marker.map, pvals = p.values) #display a manhattan plot
+```
+
+## Create a QQ Plot
+
+An additional function housed in the GWASP package is the qq_plot() function. This will output a quantile-quantile plot which will allow you to assess any inflation in your chosen GWA model. Inputs include: marker_map (see manhattan_plot description above), and pvals (see manhattan_plot description above).
+
+```{r qq_plot, warning=F}
+qq_plot(marker_map = marker.map, pvals = p.values) #display a qq plot
 ```

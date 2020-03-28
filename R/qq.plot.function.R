@@ -2,11 +2,9 @@
 #'
 #' @param marker_map A data.frame containing marker 'rs', 'chr', and 'pos' (should be in the same order as the GWAS results)
 #' @param pvals The untransformed p-values from a GWAS test
-#' @param QTN_index The indices of any known QTNs
-#' @param trait The name of the trait
 #' @return A ggplot object quantile-quantile plot
 
-qq_plot <- function(marker_map, pvals, QTN_index, trait = "unknown")
+qq_plot <- function(marker_map, pvals)
 {
 	marker_map$pvals <- -log10(pvals) # Add pvalues to the data.frame and log10 transform
 

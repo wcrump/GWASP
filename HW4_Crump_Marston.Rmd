@@ -28,7 +28,7 @@ library(GWASP)
 
 The GWASP Package is available for download on Github at: [https://github.com/wcrump/GWASP](https://github.com/wcrump/GWASP) 
 
-The GWASP Manual is available at: LINK
+The GWASP Manual is available at: [https://github.com/wcrump/GWASP/blob/master/Reference_Manual.pdf](https://github.com/wcrump/GWASP/blob/master/Reference_Manual.pdf)
 
 ## Problem 4: Perform GWAS on the data provided.
 

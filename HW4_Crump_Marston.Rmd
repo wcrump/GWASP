@@ -1,0 +1,136 @@
+---
+title: "HW4"
+author: "Elliott Marston and William Crump"
+date: "3/27/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(devtools)
+library(ape)
+library(multtest)
+library(gplots)
+library(LDheatmap)
+library(genetics)
+library(EMMREML)
+library(compiler) #this library is already installed in R
+library(scatterplot3d)
+library(ggplot2)
+
+source("http://zzlab.net/GAPIT/gapit_functions.txt")
+
+devtools::install_github("wcrump/GWASP")
+library(GWASP)
+```
+
+## GWASP Package
+
+The GWASP Package is available for download on Github at: https://github.com/wcrump/GWASP 
+
+The GWASP Manual is available at: LINK
+
+## Problem 4: Perform GWAS on the data provided.
+
+```{r Problem 4 data download, echo=FALSE}
+# Download Data
+covariate.data <- read.table("Data/CROP545_Covariates.txt", header = T)
+phenotype.data <- read.table("Data/CROP545_Phenotype.txt", header = T)
+genotype.data <- read.table("Data/mdp_numeric.txt", header = T)
+marker.map <- read.table("Data/mdp_SNP_information.txt", header = T)
+```
+```{r Problem 4 using GWASP}
+## Perform GWAS using GWASP function ----
+p.values <- GLM.func(geno = genotype.data, pheno = phenotype.data, covariates = covariate.data, PCs = 3, thresh = 0.3)
+
+## Create Manhattan and QQ Plots ----
+p.vec <- as.vector(p.values) #transforms data type of p-values to run in manhattan plot function
+GWASP_manhattan <- manhattan_plot(marker_map = marker.map, pvals = p.vec) #creates manhattan plot
+GWASP_manhattan
+
+qq_plot(marker_map = marker.map, pvals = p.vec) #creates a QQ plot
+#we can see our p-values start to deviate sharply from what we'd expect to see with a normal distribution
+```
+From our unmarked Manhattan plot, we can see that we likely have quite a few significantly associated SNPs. We can visualize this even better in a QQ plot. When compared to the red line that signifies what we'd expect to see in a normal distribution of p-values, our actual p-values deviate significantly from our expected outcome. 
+```{r Problem 4 assoc SNPs}
+## Genome-wide Threshold and Associated SNP's ----
+type1=c(0.01, 0.05, 0.1, 0.2) #vector of type 1 error rates corresponding to 1%, 5%, 10%, and 20%
+cutoff=quantile(p.vec,type1,na.rm=T) #calculation of quantiles
+genome.thresh <- cutoff[1] #with a type 1 error rate of 1%, we can excpect SNPs with p-values higher than this to be associated SNPs
+
+associated.SNP.index <- p.values <= genome.thresh #creates index of associated SNPs
+associated.SNPs <- which(associated.SNP.index) #let's us know which of our 3000 markers are our significant ones
+
+GWASP_manhattan <- manhattan_plot(marker_map = marker.map, pvals = p.vec, QTN_index = associated.SNPs) #create manhattan plot
+GWASP_manhattan <- GWASP_manhattan + geom_hline(yintercept = -log10(genome.thresh), linetype = "dashed", color = "black") #add significance threshold
+GWASP_manhattan #view manhattan plot
+```
+
+Now that we've calculated our genome-wide threshold for a Type I error rate of 1%, we see that we have 31 significantly associated SNPs. Just because they're significantly associated with our phenotype of interest, doesn't mean they're all equally informative. We can delve into this more by examining the minor allele frequencies of our SNPs of interest.
+```{r Problem 4 MAF}
+sig.snps.geno <- genotype.data[,associated.SNPs] #subset genotype data of only the significant SNPs
+
+minor_allele_freq <- apply(sig.snps.geno, 2, function(x) #we're applying the function(x) across all columns, designated by the 2, in our sig SNP genotype data to calculate MAF
+{
+	allele_freq0 <- (sum(x == 0)*2 + sum(x == 1)) / (sum(!is.na(x)) * 2) #frequency of allele 0 is calculated, includes half of heterozygote frequency
+	allele_freq2 <- (sum(x == 2)*2 + sum(x == 1)) / (sum(!is.na(x)) * 2) #frequency of allele 2 is calculated, includes half of heterozygote frequency
+	return(min(allele_freq0, allele_freq2)) #now we compare allele freq 0 to allele freq 2 and return the lesser of the two
+})
+
+ggplot(data = as.data.frame(minor_allele_freq), aes(x= seq_along(minor_allele_freq), y = minor_allele_freq)) + geom_point() +
+	labs(title = "Distribution of Minor Allele Frequency of Significant SNPs", x = "SNP Index", y = "Minor Allele Frequency")
+```
+
+We can see that the actually allele frequency varies quite a bit between our 31 SNPs of interest. One marker even has a minor allele frequency (MAF) of 0, indicating that the alternate allele of the marker is completely fixed in the population. For markers that are fixed, or that have very low MAF, they represent rarer allele variants that may be less informative to our study than markers that have more common allele variants.  
+
+## Problem 5: GWASP vs GWASbyCor
+
+Using the GAPIT tool GAPIT.FDR.TypeI, we calculated 30 replicates of the false discovery rate and power of the GWASP function performing a GWAS calculation and then repeated the process with the GWASbyCor function provided by Zhiwu Zhang in CS 545 (2020). 
+
+```{r Problem 5, warning=FALSE}
+#we're going to use the GAPIT function GAPIT.FDR.Type1 to compare power and FDR between the two methods
+nrep=30 #number of replicates
+set.seed(89760)
+GWASP.Rep=replicate(nrep, { #we're using the replicate function to perform GWAS and then calculate power and FDR multiple times
+	GWASP.sim <- GLM.func(geno = genotype.data, pheno = phenotype.data, covariates = covariate.data) #perform GWAS
+	seqQTN <- associated.SNPs # reminder that we're using our 31 SNPs
+	myGWAS <- cbind(marker.map,t(GWASP.sim),NA) #appends our GWAS results to our marker map into a single data frame
+	#calculates power and FDR using the GAPIT.FDR.TypeI function, most parameters kept to default
+	myStat <- GAPIT.FDR.TypeI(WS=c(1e0,1e3,1e4,1e5), GM = marker.map, seqQTN = associated.SNPs, GWAS = myGWAS, maxOut = 100,MaxBP=1e10)
+})
+
+set.seed(89761)
+GbyCor.Rep <- replicate(nrep, { #we can use the same replicate function structure to calculate FDR and power for GWASbyCor
+	GbyCor.sim <- GWASbyCor(X = genotype.data[,-1], y = phenotype.data[,-1])
+	seqQTN <- associated.SNPs
+	myGWAS <- cbind(marker.map, t(GbyCor.sim), NA)
+	mySTAT <- GAPIT.FDR.TypeI(WS = c(1e0, 1e3, 1e4, 1e5), GM = marker.map, seqQTN = associated.SNPs, GWAS = myGWAS, maxOut = 100, MaxBP = 1e10)
+})
+
+power.GWASP <- GWASP.Rep[[2]] #pulling out the power of the function for use in plotting
+power.GbyCor <- GbyCor.Rep[[2]] #pulling out the power of the function for use in plotting
+
+#FDR
+gwasp.fdr.seq <- seq(3,length(GWASP.Rep),7) #creates index of where FDR values are stored of every replicate
+gwasp.fdr <- GWASP.Rep[gwasp.fdr.seq] #pulls all FDR outputs into a new list of just FDR data
+gwasp.fdr.mean <- Reduce ("+", gwasp.fdr) / length(gwasp.fdr) #calculates the FDR mean for each individual replicate
+
+gbycor.fdr.seq <- seq(3, length(GbyCor.Rep), 7)
+gbycor.fdr <- GbyCor.Rep[gbycor.fdr.seq]
+gbycor.fdr.mean <- Reduce ("+", gbycor.fdr) / length(gbycor.fdr)
+
+theColor=rainbow(4) #creates color vector
+
+plot(gwasp.fdr.mean[,1],power.GWASP , main = "GWASP Power vs. FDR", type="b", col=theColor [1],xlim=c(0,1)) #plots GWASP FDR means against power
+for(i in 2:ncol(gwasp.fdr.mean)){ #shows different 'resolutions' as different colors
+	lines(gwasp.fdr.mean[,i], power.GWASP , type="b", col= theColor [i])
+}
+
+plot(gbycor.fdr.mean[,1],power.GbyCor , main = "GWASbyCor Power vs FDR", type="b", col=theColor [1],xlim=c(0,1)) #plots GbyCor FDR means against power
+for(i in 2:ncol(gbycor.fdr.mean)){ #shows different 'resolutions' as different colors
+	lines(gbycor.fdr.mean[,i], power.GbyCor , type="b", col= theColor [i])
+}
+
+```
+
+When comparing the two plots, it's clear that the GWASP package has a lower false discovery rate as the power of the test increases when compared to the GWASbyCor function. This indicates that GWASP is superior in that it has a lower likelihood of a Type I error, even as the test power increases. 

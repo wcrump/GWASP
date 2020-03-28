@@ -49,9 +49,9 @@ GWASP_manhattan <- manhattan_plot(marker_map = marker.map, pvals = p.vec) #creat
 GWASP_manhattan
 
 qq_plot(marker_map = marker.map, pvals = p.vec) #creates a QQ plot
-#we can see our p-values start to deviate sharply from what we'd expect to see with a normal distribution
+#we can see our p-values start to deviate sharply from what we'd expect to see with a uniform distribution
 ```
-From our unmarked Manhattan plot, we can see that we likely have quite a few significantly associated SNPs. We can visualize this even better in a QQ plot. When compared to the red line that signifies what we'd expect to see in a normal distribution of p-values, our actual p-values deviate significantly from our expected outcome. 
+From our unmarked Manhattan plot, we can see that we likely have quite a few significantly associated SNPs. We can visualize this even better in a QQ plot. When compared to the red line that signifies what we'd expect to see in a uniform distribution of p-values, our actual p-values deviate significantly from our expected outcome. 
 ```{r Problem 4 assoc SNPs}
 ## Genome-wide Threshold and Associated SNP's ----
 type1=c(0.01, 0.05, 0.1, 0.2) #vector of type 1 error rates corresponding to 1%, 5%, 10%, and 20%
@@ -60,6 +60,9 @@ genome.thresh <- cutoff[1] #with a type 1 error rate of 1%, we can excpect SNPs 
 
 associated.SNP.index <- p.values <= genome.thresh #creates index of associated SNPs
 associated.SNPs <- which(associated.SNP.index) #let's us know which of our 3000 markers are our significant ones
+snp.names <- colnames(genotype.data[-1]) #get names of all snps
+associated.SNP.names <- snp.names[associated.SNPs] #get names of associated snps
+print(paste("The associated SNPs are ", paste(associated.SNP.names, collapse = ", "), sep = "")) #output the names of associated snps
 
 GWASP_manhattan <- manhattan_plot(marker_map = marker.map, pvals = p.vec, QTN_index = associated.SNPs) #create manhattan plot
 GWASP_manhattan <- GWASP_manhattan + geom_hline(yintercept = -log10(genome.thresh), linetype = "dashed", color = "black") #add significance threshold
@@ -169,10 +172,17 @@ gbycor.fdr.seq <- seq(3, length(GbyCor.Rep), 7)
 gbycor.fdr <- GbyCor.Rep[gbycor.fdr.seq]
 gbycor.fdr.mean <- Reduce ("+", gbycor.fdr) / length(gbycor.fdr)
 
-###my new one
+#power x fdr curves for gwasp and gbycor for each bin size
 bin.size <- c(1e0, 1e3, 1e4, 1e5)
 for (i in 1:ncol(gwasp.fdr.mean)){
 	plot(gwasp.fdr.mean[,i], power.GWASP, type="b", col="blue", xlim=c(0,1), xlab="FDR", ylab="Power", main=paste("Power vs FDR for Bin Size ", bin.size[i]))
 	lines(gbycor.fdr.mean[,i], power.GbyCor, type="b", col="red")
+	# Add a legend
+legend("topleft", 
+  legend = c("GWASP", "GWASbyCor"), 
+  text.col = c("blue", "Red"))
 }
 ```
+  
+  
+**At most given FDRs, GWASP has more power than GWAS by correlation.**

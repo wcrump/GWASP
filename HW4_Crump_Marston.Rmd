@@ -133,4 +133,46 @@ for(i in 2:ncol(gbycor.fdr.mean)){ #shows different 'resolutions' as different c
 
 ```
 
-When comparing the two plots, it's clear that the GWASP package has a lower false discovery rate as the power of the test increases when compared to the GWASbyCor function. This indicates that GWASP is superior in that it has a lower likelihood of a Type I error, even as the test power increases. 
+When comparing the two plots, it's clear that the GWASP package has a lower false discovery rate as the power of the test increases when compared to the GWASbyCor function. This indicates that GWASP is superior in that it has a lower likelihood of a Type I error, even as the test power increases.   
+
+### Use Simulated Phenotype Data to compare GWASP with GWASbyCor
+```{r problem5.2, warning=F}
+
+set.seed(89763)
+GWASP.Rep=replicate(nrep, { #we're using the replicate function to perform GWAS and then calculate power and FDR multiple times
+	phenotype <- G2P(X=genotype.data[,-1], alpha=1, NQTN=10)
+	GWASP.sim <- GLM.func(geno = genotype.data, pheno = phenotype$y, covariates = covariate.data) #perform GWAS
+	myGWAS <- cbind(marker.map,t(GWASP.sim),NA) #appends our GWAS results to our marker map into a single data frame
+	#calculates power and FDR using the GAPIT.FDR.TypeI function, most parameters kept to default
+	myStat.gwasp <- GAPIT.FDR.TypeI(WS=c(1e0,1e3,1e4,1e5), GM = marker.map, seqQTN = phenotype$QTN.position, GWAS = myGWAS, maxOut = 100, MaxBP = 1e10)
+})
+
+
+set.seed(89763)
+GbyCor.Rep <- replicate(nrep, { #we can use the same replicate function structure to calculate FDR and power for GWASbyCor
+	phenotype <- G2P(X=genotype.data[,-1], alpha=1, NQTN=10)
+	GbyCor.sim <- GWASbyCor(X = genotype.data[,-1], y = phenotype$y)
+	myGWAS <- cbind(marker.map, t(GbyCor.sim), NA)
+	mySTAT <- GAPIT.FDR.TypeI(WS = c(1e0, 1e3, 1e4, 1e5), GM = marker.map, seqQTN = phenotype$QTN.position, GWAS = myGWAS, maxOut = 100, MaxBP = 1e10)
+})
+
+
+power.GWASP <- GWASP.Rep[[2]] #pulling out the power of the function for use in plotting
+power.GbyCor <- GbyCor.Rep[[2]] #pulling out the power of the function for use in plotting
+
+#FDR
+gwasp.fdr.seq <- seq(3,length(GWASP.Rep),7) #creates index of where FDR values are stored of every replicate
+gwasp.fdr <- GWASP.Rep[gwasp.fdr.seq] #pulls all FDR outputs into a new list of just FDR data
+gwasp.fdr.mean <- Reduce ("+", gwasp.fdr) / length(gwasp.fdr) #calculates the FDR mean for each individual replicate
+
+gbycor.fdr.seq <- seq(3, length(GbyCor.Rep), 7)
+gbycor.fdr <- GbyCor.Rep[gbycor.fdr.seq]
+gbycor.fdr.mean <- Reduce ("+", gbycor.fdr) / length(gbycor.fdr)
+
+###my new one
+bin.size <- c(1e0, 1e3, 1e4, 1e5)
+for (i in 1:ncol(gwasp.fdr.mean)){
+	plot(gwasp.fdr.mean[,i], power.GWASP, type="b", col="blue", xlim=c(0,1), xlab="FDR", ylab="Power", main=paste("Power vs FDR for Bin Size ", bin.size[i]))
+	lines(gbycor.fdr.mean[,i], power.GbyCor, type="b", col="red")
+}
+```

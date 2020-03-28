@@ -4,18 +4,18 @@
 \alias{GLM.func}
 \title{GWAS by GLM}
 \usage{
-GLM.func(geno = NULL, pheno = NULL, covariates = NULL, PCs = 1, thresh = 0.2)
+GLM.func(X = NULL, y = NULL, C = NULL, PCs = 1, r = 0.2)
 }
 \arguments{
-\item{geno}{A matrix of genotype data with dimensions n x m}
+\item{X}{A matrix of genotype data with dimensions n x m}
 
-\item{pheno}{A matrix of phenotype data with dimensions n x 1}
+\item{y}{A matrix of phenotype data with dimensions n x 1}
 
-\item{covariates}{A matrix of covariate data with dimensions n x t}
+\item{C}{A matrix of covariate data with dimensions n x t}
 
 \item{PCs}{A matrix of principle components with dimensions n x ? (variable number of PCs)}
 
-\item{thresh}{A numeric (0-1) indicating the correlation value of any PC-covariate pair at which the PC will be exluded from model}
+\item{r}{A numeric (0-1) indicating the correlation value of any PC-covariate pair at which the PC will be exluded from model}
 }
 \value{
 A matrix of p values with dimensions 1 x m

@@ -2,19 +2,19 @@
 #'
 #' Perform GWAS using a general linear model method incorporating principle components and additional covariates if present.
 #'
-#' @param geno A matrix of genotype data with dimensions n x m
-#' @param pheno A matrix of phenotype data with dimensions n x 1
-#' @param covariates A matrix of covariate data with dimensions n x t
+#' @param X A matrix of genotype data with dimensions n x m
+#' @param y A matrix of phenotype data with dimensions n x 1
+#' @param C A matrix of covariate data with dimensions n x t
 #' @param PCs A matrix of principle components with dimensions n x ? (variable number of PCs)
-#' @param thresh A numeric (0-1) indicating the correlation value of any PC-covariate pair at which the PC will be exluded from model
+#' @param r A numeric (0-1) indicating the correlation value of any PC-covariate pair at which the PC will be exluded from model
 #' @return A matrix of p values with dimensions 1 x m
 
-GLM.func <- function(geno = NULL, pheno = NULL, covariates = NULL, PCs = 1, thresh = 0.2){
-	working.geno <- check.name(geno) #pull user input into genotype matrix, possible data transformation?
-	working.pheno <- check.name(pheno) #pull user input into phenotype matrix
-	working.cov <- check.name(covariates) #pull user input into covariate matrix
+GLM.func <- function(X = NULL, y = NULL, C = NULL, PCs = 1, r = 0.2){
+	working.geno <- check.name(X) #pull user input into genotype matrix, possible data transformation?
+	working.pheno <- check.name(y) #pull user input into phenotype matrix
+	working.cov <- check.name(C) #pull user input into covariate matrix
 	working.PCs <- PCs #pull in user-defined number of PCs into PC matrix
-	working.thresh <- thresh #pull in user-defined correlation threshold between any given PC-covariate pair
+	working.thresh <- r #pull in user-defined correlation threshold between any given PC-covariate pair
 
 	PCA <- prcomp(working.geno) #perform PCA on the genotypes
 	filtered.PCs <- filter.pca(PCA = PCA, covs = working.cov, threshold = working.thresh) #filter PCs by covariates according to correlation threshold supplied by user
